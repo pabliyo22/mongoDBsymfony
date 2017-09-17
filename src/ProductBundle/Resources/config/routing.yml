@@ -1,3 +1,8 @@
 product_homepage:
-    path:     /new/product/
+    path:     /
     defaults: { _controller: ProductBundle:Default:index }
+
+
+product_add:
+    path:     /new/product/
+    defaults: { _controller: ProductBundle:Default:add }

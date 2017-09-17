@@ -64,10 +64,10 @@ class User extends \AppBundle\Document\User implements \Doctrine\ODM\MongoDB\Pro
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', 'name', 'price', 'username', 'usernameCanonical', 'email', 'emailCanonical', 'enabled', 'salt', 'password', 'plainPassword', 'lastLogin', 'confirmationToken', 'passwordRequestedAt', 'groups', 'roles'];
+            return ['__isInitialized__', 'id', 'name', 'price', '' . "\0" . 'AppBundle\\Document\\User' . "\0" . '_ignoreFields'];
         }
 
-        return ['__isInitialized__', 'id', 'name', 'price', 'username', 'usernameCanonical', 'email', 'emailCanonical', 'enabled', 'salt', 'password', 'plainPassword', 'lastLogin', 'confirmationToken', 'passwordRequestedAt', 'groups', 'roles'];
+        return ['__isInitialized__', 'id', 'name', 'price', '' . "\0" . 'AppBundle\\Document\\User' . "\0" . '_ignoreFields'];
     }
 
     /**
@@ -220,50 +220,6 @@ class User extends \AppBundle\Document\User implements \Doctrine\ODM\MongoDB\Pro
     /**
      * {@inheritDoc}
      */
-    public function addRole($role)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addRole', [$role]);
-
-        return parent::addRole($role);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function serialize()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'serialize', []);
-
-        return parent::serialize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unserialize($serialized)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'unserialize', [$serialized]);
-
-        return parent::unserialize($serialized);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function eraseCredentials()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'eraseCredentials', []);
-
-        return parent::eraseCredentials();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getId()
     {
         if ($this->__isInitialized__ === false) {
@@ -279,419 +235,45 @@ class User extends \AppBundle\Document\User implements \Doctrine\ODM\MongoDB\Pro
     /**
      * {@inheritDoc}
      */
-    public function getUsername()
+    public function toArray()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUsername', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'toArray', []);
 
-        return parent::getUsername();
+        return parent::toArray();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getUsernameCanonical()
+    public function toJSON()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUsernameCanonical', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'toJSON', []);
 
-        return parent::getUsernameCanonical();
+        return parent::toJSON();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getSalt()
+    public function setIgnoredFields(array $fields)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSalt', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIgnoredFields', [$fields]);
 
-        return parent::getSalt();
+        return parent::setIgnoredFields($fields);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getEmail()
+    public function toStdClass()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEmail', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'toStdClass', []);
 
-        return parent::getEmail();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getEmailCanonical()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEmailCanonical', []);
-
-        return parent::getEmailCanonical();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getPassword()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPassword', []);
-
-        return parent::getPassword();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getPlainPassword()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPlainPassword', []);
-
-        return parent::getPlainPassword();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getLastLogin()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getLastLogin', []);
-
-        return parent::getLastLogin();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getConfirmationToken()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getConfirmationToken', []);
-
-        return parent::getConfirmationToken();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getRoles()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRoles', []);
-
-        return parent::getRoles();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function hasRole($role)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'hasRole', [$role]);
-
-        return parent::hasRole($role);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isAccountNonExpired()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isAccountNonExpired', []);
-
-        return parent::isAccountNonExpired();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isAccountNonLocked()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isAccountNonLocked', []);
-
-        return parent::isAccountNonLocked();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isCredentialsNonExpired()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isCredentialsNonExpired', []);
-
-        return parent::isCredentialsNonExpired();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isEnabled()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isEnabled', []);
-
-        return parent::isEnabled();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isSuperAdmin()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isSuperAdmin', []);
-
-        return parent::isSuperAdmin();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function removeRole($role)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeRole', [$role]);
-
-        return parent::removeRole($role);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setUsername($username)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUsername', [$username]);
-
-        return parent::setUsername($username);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setUsernameCanonical($usernameCanonical)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUsernameCanonical', [$usernameCanonical]);
-
-        return parent::setUsernameCanonical($usernameCanonical);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setSalt($salt)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSalt', [$salt]);
-
-        return parent::setSalt($salt);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setEmail($email)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setEmail', [$email]);
-
-        return parent::setEmail($email);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setEmailCanonical($emailCanonical)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setEmailCanonical', [$emailCanonical]);
-
-        return parent::setEmailCanonical($emailCanonical);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setEnabled($boolean)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setEnabled', [$boolean]);
-
-        return parent::setEnabled($boolean);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setPassword($password)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPassword', [$password]);
-
-        return parent::setPassword($password);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setSuperAdmin($boolean)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSuperAdmin', [$boolean]);
-
-        return parent::setSuperAdmin($boolean);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setPlainPassword($password)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPlainPassword', [$password]);
-
-        return parent::setPlainPassword($password);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setLastLogin(\DateTime $time = NULL)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setLastLogin', [$time]);
-
-        return parent::setLastLogin($time);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setConfirmationToken($confirmationToken)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setConfirmationToken', [$confirmationToken]);
-
-        return parent::setConfirmationToken($confirmationToken);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setPasswordRequestedAt(\DateTime $date = NULL)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPasswordRequestedAt', [$date]);
-
-        return parent::setPasswordRequestedAt($date);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getPasswordRequestedAt()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPasswordRequestedAt', []);
-
-        return parent::getPasswordRequestedAt();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isPasswordRequestNonExpired($ttl)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isPasswordRequestNonExpired', [$ttl]);
-
-        return parent::isPasswordRequestNonExpired($ttl);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setRoles(array $roles)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRoles', [$roles]);
-
-        return parent::setRoles($roles);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getGroups()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGroups', []);
-
-        return parent::getGroups();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getGroupNames()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGroupNames', []);
-
-        return parent::getGroupNames();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function hasGroup($name)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'hasGroup', [$name]);
-
-        return parent::hasGroup($name);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addGroup(\FOS\UserBundle\Model\GroupInterface $group)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addGroup', [$group]);
-
-        return parent::addGroup($group);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function removeGroup(\FOS\UserBundle\Model\GroupInterface $group)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeGroup', [$group]);
-
-        return parent::removeGroup($group);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', []);
-
-        return parent::__toString();
+        return parent::toStdClass();
     }
 
 }

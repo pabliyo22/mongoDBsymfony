@@ -105,22 +105,34 @@ class appDevDebugProjectContainerUrlMatcher extends Symfony\Bundle\FrameworkBund
 
         }
 
-        // product_homepage
-        if (rtrim($pathinfo, '/') === '/product/new/product') {
-            if (substr($pathinfo, -1) !== '/') {
-                return $this->redirect($pathinfo.'/', 'product_homepage');
+        if (0 === strpos($pathinfo, '/product')) {
+            // product_homepage
+            if (rtrim($pathinfo, '/') === '/product') {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'product_homepage');
+                }
+
+                return array (  '_controller' => 'ProductBundle\\Controller\\DefaultController::indexAction',  '_route' => 'product_homepage',);
             }
 
-            return array (  '_controller' => 'ProductBundle\\Controller\\DefaultController::indexAction',  '_route' => 'product_homepage',);
+            // product_add
+            if (rtrim($pathinfo, '/') === '/product/new/product') {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'product_add');
+                }
+
+                return array (  '_controller' => 'ProductBundle\\Controller\\DefaultController::addAction',  '_route' => 'product_add',);
+            }
+
         }
 
-        // homepage
-        if (rtrim($pathinfo, '/') === '/app') {
+        // index
+        if (rtrim($pathinfo, '/') === '') {
             if (substr($pathinfo, -1) !== '/') {
-                return $this->redirect($pathinfo.'/', 'homepage');
+                return $this->redirect($pathinfo.'/', 'index');
             }
 
-            return array (  '_controller' => 'AppBundle\\Controller\\DefaultController::indexAction',  '_route' => 'homepage',);
+            return array (  '_controller' => 'AppBundle\\Controller\\DefaultController::indexAction',  '_route' => 'index',);
         }
 
         if (0 === strpos($pathinfo, '/log')) {

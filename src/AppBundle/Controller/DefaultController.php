@@ -8,14 +8,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller {
 
-    /**
-     * @Route("/", name="homepage")
-     */
     public function indexAction(Request $request) {
 
-        $users = null;
-        return $this->render('AppBundle:Default:index.html.twig', array(
-                    'users' => $users,
+
+
+        $dm = $this->get('doctrine_mongodb')->getManager();
+        $list = $dm->getRepository("AppBundle:HandlerShippingEGMLog")->findAll();
+        return $this->render('index.html.twig', array(
+                    'list' => $list,
         ));
     }
 

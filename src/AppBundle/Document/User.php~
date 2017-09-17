@@ -6,11 +6,15 @@ namespace AppBundle\Document;
 
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use ProductBundle\Traits\DocumentSerializer;
 
 /**
  * @MongoDB\Document
  */
-class User extends BaseUser {
+class User {
+
+// NOTE: You have to use this trait to all it's embedded documents too
+    use DocumentSerializer;
 
     /**
      * @MongoDB\Id
@@ -27,15 +31,13 @@ class User extends BaseUser {
      */
     protected $price;
 
-
     /**
      * Set name
      *
      * @param string $name
      * @return $this
      */
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->name = $name;
         return $this;
     }
@@ -45,8 +47,7 @@ class User extends BaseUser {
      *
      * @return string $name
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -56,8 +57,7 @@ class User extends BaseUser {
      * @param float $price
      * @return $this
      */
-    public function setPrice($price)
-    {
+    public function setPrice($price) {
         $this->price = $price;
         return $this;
     }
@@ -67,8 +67,18 @@ class User extends BaseUser {
      *
      * @return float $price
      */
-    public function getPrice()
-    {
+    public function getPrice() {
         return $this->price;
+    }
+
+
+    /**
+     * Get id
+     *
+     * @return id $id
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 }

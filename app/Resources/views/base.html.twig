@@ -30,19 +30,26 @@
         -->
         {% block stylesheets %}
             <link href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel="stylesheet">
-            <link href="material.cyan-light_blue.min.css" rel="stylesheet">
+            <link href="{{ asset('css/material.cyan-light_blue.min.css')}}" rel="stylesheet">
 
             <!-- Compiled and minified CSS -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+            <script src="{{ asset('js/jquery-3.2.1.min.js')}}"></script>
+            <script src="{{ asset('js/toastr.min.js')}}"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+            <script src="{{ asset('js/underscore-min.js')}}"></script>
+            <script src="{{asset('js/material.min.js')}}"></script>
+            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+           
+
 
             <!-- Compiled and minified JavaScript -->
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 
             <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-
             <link rel="stylesheet" href="{{ asset('css/material.min.css')}}">
             <link rel="stylesheet" href="{{ asset('css/styles.css') }}" >
+            <link rel="stylesheet" href="{{ asset('css/toastr.min.css')}}">
             <style>
                 #view-source {
                     position: fixed;
@@ -55,6 +62,7 @@
                 }
             </style>
         {% endblock  %}
+
     </head>
     <body>
         {% block body %}
@@ -62,7 +70,9 @@
                 <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
                     <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
                         <div class="mdl-layout__header-row">
-                            <span class="mdl-layout-title">Home</span>
+                            <span class="mdl-layout-title">Home </span>
+
+                            <a   id="addProduct"  class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
                             <div class="mdl-layout-spacer"></div>
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
                                 <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
@@ -98,7 +108,7 @@
                                 <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
                                     <li class="mdl-menu__item">hello@example.com</li>
                                     <li class="mdl-menu__item">info@example.com</li>
-                                    <li class="mdl-menu__item"><i class="material-icons">add</i>Add another account...</li>
+                                    <li  class="mdl-menu__item"><a  ><i class="material-icons">add</i>Add another account...</a></li>
                                 </ul>
                             </div>
                         </header>
@@ -122,10 +132,32 @@
                     {% endblock navbar%}
                 </div>
 
+                <script >
 
+
+                    $("#addProduct").click(function () {
+                        var compiled = _.template("<td><% name %</td> \
+                                                   <td><% price %</td> \
+                                                   <td><% _id %</td>");
+
+                        var jqxhr = $.getJSON("{{ path('product_add')}}");
+                        jqxhr.done(function (data) {
+                            toastr.info('Are you the 6 fingered man?');
+                            $.each(data.users, function (index, value) {
+                                $("#contentTableUser").html(compiled(value));
+                            });
+
+
+                        });
+                    }
+                    );
+                </script>
                 {% block js %}
-                    <script src="{{asset('js/material.min.js')}}"></script>
                 {% endblock %}
+                {% block content %}
+                {% endblock %}
+
+
                 {% block grafics %}
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" style="position: fixed; left: -1000px; height: -1000px;">
                     <defs>
