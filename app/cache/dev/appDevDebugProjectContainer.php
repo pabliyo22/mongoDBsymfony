@@ -43,6 +43,8 @@ class appDevDebugProjectContainer extends Container
             'cache_warmer' => 'getCacheWarmerService',
             'config_cache_factory' => 'getConfigCacheFactoryService',
             'controller_name_converter' => 'getControllerNameConverterService',
+            'core.authentication_handler' => 'getCore_AuthenticationHandlerService',
+            'core.logout_handler' => 'getCore_LogoutHandlerService',
             'data_collector.dump' => 'getDataCollector_DumpService',
             'data_collector.form' => 'getDataCollector_FormService',
             'data_collector.form.extractor' => 'getDataCollector_Form_ExtractorService',
@@ -146,7 +148,6 @@ class appDevDebugProjectContainer extends Container
             'fos_user.security.interactive_login_listener' => 'getFosUser_Security_InteractiveLoginListenerService',
             'fos_user.security.login_manager' => 'getFosUser_Security_LoginManagerService',
             'fos_user.user_manager' => 'getFosUser_UserManagerService',
-            'fos_user.user_provider.username' => 'getFosUser_UserProvider_UsernameService',
             'fos_user.username_form_type' => 'getFosUser_UsernameFormTypeService',
             'fos_user.util.canonical_fields_updater' => 'getFosUser_Util_CanonicalFieldsUpdaterService',
             'fos_user.util.email_canonicalizer' => 'getFosUser_Util_EmailCanonicalizerService',
@@ -191,25 +192,33 @@ class appDevDebugProjectContainer extends Container
             'router_listener' => 'getRouterListenerService',
             'routing.loader' => 'getRouting_LoaderService',
             'security.access.decision_manager' => 'getSecurity_Access_DecisionManagerService',
+            'security.access_listener' => 'getSecurity_AccessListenerService',
+            'security.access_map' => 'getSecurity_AccessMapService',
             'security.authentication.guard_handler' => 'getSecurity_Authentication_GuardHandlerService',
             'security.authentication.manager' => 'getSecurity_Authentication_ManagerService',
             'security.authentication.session_strategy' => 'getSecurity_Authentication_SessionStrategyService',
             'security.authentication.trust_resolver' => 'getSecurity_Authentication_TrustResolverService',
             'security.authentication_utils' => 'getSecurity_AuthenticationUtilsService',
             'security.authorization_checker' => 'getSecurity_AuthorizationCheckerService',
+            'security.channel_listener' => 'getSecurity_ChannelListenerService',
             'security.context' => 'getSecurity_ContextService',
             'security.csrf.token_manager' => 'getSecurity_Csrf_TokenManagerService',
             'security.encoder_factory' => 'getSecurity_EncoderFactoryService',
             'security.firewall' => 'getSecurity_FirewallService',
-            'security.firewall.map.context.main' => 'getSecurity_Firewall_Map_Context_MainService',
+            'security.firewall.map.context.default' => 'getSecurity_Firewall_Map_Context_DefaultService',
+            'security.firewall.map.context.dev' => 'getSecurity_Firewall_Map_Context_DevService',
+            'security.firewall.map.context.login_firewall' => 'getSecurity_Firewall_Map_Context_LoginFirewallService',
+            'security.http_utils' => 'getSecurity_HttpUtilsService',
             'security.logout_url_generator' => 'getSecurity_LogoutUrlGeneratorService',
             'security.password_encoder' => 'getSecurity_PasswordEncoderService',
             'security.rememberme.response_listener' => 'getSecurity_Rememberme_ResponseListenerService',
             'security.role_hierarchy' => 'getSecurity_RoleHierarchyService',
             'security.secure_random' => 'getSecurity_SecureRandomService',
             'security.token_storage' => 'getSecurity_TokenStorageService',
-            'security.user_checker.main' => 'getSecurity_UserChecker_MainService',
+            'security.user.provider.concrete.teceng_user_provider' => 'getSecurity_User_Provider_Concrete_TecengUserProviderService',
+            'security.user_checker.login_firewall' => 'getSecurity_UserChecker_LoginFirewallService',
             'security.validator.user_password' => 'getSecurity_Validator_UserPasswordService',
+            'security_listener' => 'getSecurityListenerService',
             'sensio_distribution.security_checker' => 'getSensioDistribution_SecurityCheckerService',
             'sensio_distribution.security_checker.command' => 'getSensioDistribution_SecurityChecker_CommandService',
             'sensio_distribution.webconfigurator' => 'getSensioDistribution_WebconfiguratorService',
@@ -310,6 +319,7 @@ class appDevDebugProjectContainer extends Container
             'event_dispatcher' => 'debug.event_dispatcher',
             'fos_user.util.username_canonicalizer' => 'fos_user.util.email_canonicalizer',
             'mailer' => 'swiftmailer.mailer.default',
+            'security.user_checker.default' => 'security.user_checker.login_firewall',
             'sensio.distribution.webconfigurator' => 'sensio_distribution.webconfigurator',
             'session.storage' => 'session.storage.native',
             'swiftmailer.mailer' => 'swiftmailer.mailer.default',
@@ -402,6 +412,26 @@ class appDevDebugProjectContainer extends Container
     }
 
     /**
+     * Gets the public 'core.authentication_handler' shared service.
+     *
+     * @return \AppBundle\Security\Authentication\Handler\AuthenticationHandler
+     */
+    protected function getCore_AuthenticationHandlerService()
+    {
+        return $this->services['core.authentication_handler'] = new \AppBundle\Security\Authentication\Handler\AuthenticationHandler($this->get('security.authentication_utils'), $this->get('router'), $this->get('translator.default'));
+    }
+
+    /**
+     * Gets the public 'core.logout_handler' shared service.
+     *
+     * @return \AppBundle\Security\Http\Logout\Handler\LogoutHandler
+     */
+    protected function getCore_LogoutHandlerService()
+    {
+        return $this->services['core.logout_handler'] = new \AppBundle\Security\Http\Logout\Handler\LogoutHandler($this->get('doctrine.orm.default_entity_manager'), $this->get('router'), $this->get('security.context'));
+    }
+
+    /**
      * Gets the public 'data_collector.dump' shared service.
      *
      * @return \Symfony\Component\HttpKernel\DataCollector\DumpDataCollector
@@ -490,6 +520,7 @@ class appDevDebugProjectContainer extends Container
     {
         $this->services['debug.event_dispatcher'] = $instance = new \Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher(new \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher($this), $this->get('debug.stopwatch'), $this->get('monolog.logger.event', ContainerInterface::NULL_ON_INVALID_REFERENCE));
 
+        $instance->addListenerService('security.interactive_login', array(0 => 'security_listener', 1 => 'onSecurityInteractiveLogin'), 0);
         $instance->addListenerService('kernel.controller', array(0 => 'data_collector.router', 1 => 'onKernelController'), 0);
         $instance->addSubscriberService('response_listener', 'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener');
         $instance->addSubscriberService('streamed_response_listener', 'Symfony\\Component\\HttpKernel\\EventListener\\StreamedResponseListener');
@@ -1508,7 +1539,7 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getFosUser_Security_LoginManagerService()
     {
-        return $this->services['fos_user.security.login_manager'] = new \FOS\UserBundle\Security\LoginManager($this->get('security.token_storage'), $this->get('security.user_checker.main'), $this->get('security.authentication.session_strategy'), $this->get('request_stack'), NULL);
+        return $this->services['fos_user.security.login_manager'] = new \FOS\UserBundle\Security\LoginManager($this->get('security.token_storage'), $this->get('security.user_checker.login_firewall'), $this->get('security.authentication.session_strategy'), $this->get('request_stack'), NULL);
     }
 
     /**
@@ -2127,50 +2158,53 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getSecurity_FirewallService()
     {
-        return $this->services['security.firewall'] = new \Symfony\Component\Security\Http\Firewall(new \Symfony\Bundle\SecurityBundle\Security\FirewallMap($this, array('security.firewall.map.context.main' => new \Symfony\Component\HttpFoundation\RequestMatcher('^/'))), $this->get('debug.event_dispatcher'));
+        return $this->services['security.firewall'] = new \Symfony\Component\Security\Http\Firewall(new \Symfony\Bundle\SecurityBundle\Security\FirewallMap($this, array('security.firewall.map.context.dev' => new \Symfony\Component\HttpFoundation\RequestMatcher('^/(_(profiler|wdt)|css|images|js)/'), 'security.firewall.map.context.login_firewall' => new \Symfony\Component\HttpFoundation\RequestMatcher('^/login$'), 'security.firewall.map.context.default' => new \Symfony\Component\HttpFoundation\RequestMatcher('^/login'))), $this->get('debug.event_dispatcher'));
     }
 
     /**
-     * Gets the public 'security.firewall.map.context.main' shared service.
+     * Gets the public 'security.firewall.map.context.default' shared service.
      *
      * @return \Symfony\Bundle\SecurityBundle\Security\FirewallContext
      */
-    protected function getSecurity_Firewall_Map_Context_MainService()
+    protected function getSecurity_Firewall_Map_Context_DefaultService()
     {
-        $a = $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE);
-        $b = $this->get('security.token_storage');
+        $a = $this->get('security.token_storage');
+        $b = $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE);
         $c = $this->get('debug.event_dispatcher', ContainerInterface::NULL_ON_INVALID_REFERENCE);
-        $d = $this->get('router', ContainerInterface::NULL_ON_INVALID_REFERENCE);
-        $e = $this->get('http_kernel');
+        $d = $this->get('security.http_utils');
+        $e = $this->get('core.authentication_handler');
         $f = $this->get('security.authentication.manager');
+        $g = $this->get('http_kernel');
 
-        $g = new \Symfony\Component\HttpFoundation\RequestMatcher('^/login$');
+        $h = new \Symfony\Component\Security\Http\Firewall\LogoutListener($a, $d, $this->get('core.logout_handler'), array('csrf_parameter' => '_csrf_token', 'csrf_token_id' => 'logout', 'logout_path' => '/logout'));
+        $h->addHandler(new \Symfony\Component\Security\Http\Logout\SessionLogoutHandler());
 
-        $h = new \Symfony\Component\HttpFoundation\RequestMatcher('^/register');
+        $i = new \Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint($g, $d, '/login', false);
 
-        $i = new \Symfony\Component\HttpFoundation\RequestMatcher('^/resetting');
+        return $this->services['security.firewall.map.context.default'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => new \Symfony\Component\Security\Http\Firewall\ContextListener($a, array(0 => $this->get('security.user.provider.concrete.teceng_user_provider')), 'default', $b, $c), 2 => $h, 3 => new \Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener($a, $f, $this->get('security.authentication.session_strategy'), $d, 'default', new \Symfony\Component\Security\Http\Authentication\CustomAuthenticationSuccessHandler($e, array('login_path' => '/login', 'default_target_path' => 'main_index', 'always_use_default_target_path' => false, 'target_path_parameter' => '_target_path', 'use_referer' => false), 'default'), new \Symfony\Component\Security\Http\Authentication\CustomAuthenticationFailureHandler($e, array('login_path' => '/login', 'failure_path' => NULL, 'failure_forward' => false, 'failure_path_parameter' => '_failure_path')), array('check_path' => '/login_check', 'use_forward' => false, 'require_previous_session' => true, 'username_parameter' => '_username', 'password_parameter' => '_password', 'csrf_parameter' => '_csrf_token', 'csrf_token_id' => 'authenticate', 'post_only' => true), $b, $c, $this->get('form.csrf_provider')), 4 => new \Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener($a, $f, 'default', $i, $b), 5 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $d, 'default', $i, NULL, NULL, $b, false));
+    }
 
-        $j = new \Symfony\Component\HttpFoundation\RequestMatcher('^/admin/');
+    /**
+     * Gets the public 'security.firewall.map.context.dev' shared service.
+     *
+     * @return \Symfony\Bundle\SecurityBundle\Security\FirewallContext
+     */
+    protected function getSecurity_Firewall_Map_Context_DevService()
+    {
+        return $this->services['security.firewall.map.context.dev'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(), NULL);
+    }
 
-        $k = new \Symfony\Component\Security\Http\AccessMap();
-        $k->add($g, array(0 => 'IS_AUTHENTICATED_ANONYMOUSLY'), NULL);
-        $k->add($h, array(0 => 'IS_AUTHENTICATED_ANONYMOUSLY'), NULL);
-        $k->add($i, array(0 => 'IS_AUTHENTICATED_ANONYMOUSLY'), NULL);
-        $k->add($j, array(0 => 'ROLE_ADMIN'), NULL);
+    /**
+     * Gets the public 'security.firewall.map.context.login_firewall' shared service.
+     *
+     * @return \Symfony\Bundle\SecurityBundle\Security\FirewallContext
+     */
+    protected function getSecurity_Firewall_Map_Context_LoginFirewallService()
+    {
+        $a = $this->get('security.token_storage');
+        $b = $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE);
 
-        $l = new \Symfony\Component\Security\Http\HttpUtils($d, $d);
-
-        $m = new \Symfony\Component\Security\Http\Firewall\LogoutListener($b, $l, new \Symfony\Component\Security\Http\Logout\DefaultLogoutSuccessHandler($l, '/'), array('csrf_parameter' => '_csrf_token', 'csrf_token_id' => 'logout', 'logout_path' => '/logout'));
-        $m->addHandler(new \Symfony\Component\Security\Http\Logout\SessionLogoutHandler());
-
-        $n = new \Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler($l, array());
-        $n->setOptions(array('always_use_default_target_path' => false, 'default_target_path' => '/', 'login_path' => '/login', 'target_path_parameter' => '_target_path', 'use_referer' => false));
-        $n->setProviderKey('main');
-
-        $o = new \Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler($e, $l, array(), $a);
-        $o->setOptions(array('login_path' => '/login', 'failure_path' => NULL, 'failure_forward' => false, 'failure_path_parameter' => '_failure_path'));
-
-        return $this->services['security.firewall.map.context.main'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => new \Symfony\Component\Security\Http\Firewall\ChannelListener($k, new \Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint(80, 443), $a), 1 => new \Symfony\Component\Security\Http\Firewall\ContextListener($b, array(0 => $this->get('fos_user.user_provider.username')), 'main', $a, $c), 2 => $m, 3 => new \Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener($b, $f, $this->get('security.authentication.session_strategy'), $l, 'main', $n, $o, array('check_path' => '/login_check', 'use_forward' => false, 'require_previous_session' => true, 'username_parameter' => '_username', 'password_parameter' => '_password', 'csrf_parameter' => '_csrf_token', 'csrf_token_id' => 'authenticate', 'post_only' => true), $a, $c, $this->get('security.csrf.token_manager')), 4 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($b, '59bdc3e12f3aa3.51604075', $a, $f), 5 => new \Symfony\Component\Security\Http\Firewall\AccessListener($b, $this->get('security.access.decision_manager'), $k, $f)), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($b, $this->get('security.authentication.trust_resolver'), $l, 'main', new \Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint($e, $l, '/login', false), NULL, NULL, $a, false));
+        return $this->services['security.firewall.map.context.login_firewall'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => new \Symfony\Component\Security\Http\Firewall\ContextListener($a, array(0 => $this->get('security.user.provider.concrete.teceng_user_provider')), 'login_firewall', $b, $this->get('debug.event_dispatcher', ContainerInterface::NULL_ON_INVALID_REFERENCE)), 2 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($a, '59d566384881e8.51523495', $b, $this->get('security.authentication.manager')), 3 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $this->get('security.http_utils'), 'login_firewall', NULL, NULL, NULL, $b, false));
     }
 
     /**
@@ -2218,13 +2252,13 @@ class appDevDebugProjectContainer extends Container
     }
 
     /**
-     * Gets the public 'security.user_checker.main' shared service.
+     * Gets the public 'security.user_checker.login_firewall' shared service.
      *
      * @return \Symfony\Component\Security\Core\User\UserChecker
      */
-    protected function getSecurity_UserChecker_MainService()
+    protected function getSecurity_UserChecker_LoginFirewallService()
     {
-        return $this->services['security.user_checker.main'] = new \Symfony\Component\Security\Core\User\UserChecker();
+        return $this->services['security.user_checker.login_firewall'] = new \Symfony\Component\Security\Core\User\UserChecker();
     }
 
     /**
@@ -2235,6 +2269,16 @@ class appDevDebugProjectContainer extends Container
     protected function getSecurity_Validator_UserPasswordService()
     {
         return $this->services['security.validator.user_password'] = new \Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator($this->get('security.token_storage'), $this->get('security.encoder_factory'));
+    }
+
+    /**
+     * Gets the public 'security_listener' shared service.
+     *
+     * @return \AppBundle\Listener\SecurityListener
+     */
+    protected function getSecurityListenerService()
+    {
+        return $this->services['security_listener'] = new \AppBundle\Listener\SecurityListener($this->get('security.context'), $this->get('doctrine.orm.default_entity_manager'), $this->get('debug.event_dispatcher'), $this->get('router'));
     }
 
     /**
@@ -3023,6 +3067,7 @@ class appDevDebugProjectContainer extends Container
         $instance->addPath(($this->targetDirs[3].'/vendor/doctrine/mongodb-odm-bundle/Resources/views'), 'DoctrineMongoDB');
         $instance->addPath(($this->targetDirs[2].'/Resources/FOSUserBundle/views'), 'FOSUser');
         $instance->addPath(($this->targetDirs[3].'/vendor/friendsofsymfony/user-bundle/Resources/views'), 'FOSUser');
+        $instance->addPath(($this->targetDirs[3].'/src/ProductBundle/Resources/views'), 'Product');
         $instance->addPath(($this->targetDirs[3].'/vendor/symfony/symfony/src/Symfony/Bundle/DebugBundle/Resources/views'), 'Debug');
         $instance->addPath(($this->targetDirs[3].'/vendor/symfony/symfony/src/Symfony/Bundle/WebProfilerBundle/Resources/views'), 'WebProfiler');
         $instance->addPath(($this->targetDirs[3].'/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/views'), 'SensioDistribution');
@@ -3233,16 +3278,6 @@ class appDevDebugProjectContainer extends Container
     }
 
     /**
-     * Gets the private 'fos_user.user_provider.username' shared service.
-     *
-     * @return \FOS\UserBundle\Security\UserProvider
-     */
-    protected function getFosUser_UserProvider_UsernameService()
-    {
-        return $this->services['fos_user.user_provider.username'] = new \FOS\UserBundle\Security\UserProvider($this->get('fos_user.user_manager'));
-    }
-
-    /**
      * Gets the private 'fos_user.util.canonical_fields_updater' shared service.
      *
      * @return \FOS\UserBundle\Util\CanonicalFieldsUpdater
@@ -3302,13 +3337,33 @@ class appDevDebugProjectContainer extends Container
     }
 
     /**
+     * Gets the private 'security.access_listener' shared service.
+     *
+     * @return \Symfony\Component\Security\Http\Firewall\AccessListener
+     */
+    protected function getSecurity_AccessListenerService()
+    {
+        return $this->services['security.access_listener'] = new \Symfony\Component\Security\Http\Firewall\AccessListener($this->get('security.token_storage'), $this->get('security.access.decision_manager'), $this->get('security.access_map'), $this->get('security.authentication.manager'));
+    }
+
+    /**
+     * Gets the private 'security.access_map' shared service.
+     *
+     * @return \Symfony\Component\Security\Http\AccessMap
+     */
+    protected function getSecurity_AccessMapService()
+    {
+        return $this->services['security.access_map'] = new \Symfony\Component\Security\Http\AccessMap();
+    }
+
+    /**
      * Gets the private 'security.authentication.manager' shared service.
      *
      * @return \Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager
      */
     protected function getSecurity_Authentication_ManagerService()
     {
-        $this->services['security.authentication.manager'] = $instance = new \Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager(array(0 => new \Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider($this->get('fos_user.user_provider.username'), $this->get('security.user_checker.main'), 'main', $this->get('security.encoder_factory'), true), 1 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('59bdc3e12f3aa3.51604075')), true);
+        $this->services['security.authentication.manager'] = $instance = new \Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager(array(0 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('59d566384881e8.51523495'), 1 => new \Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider($this->get('security.user.provider.concrete.teceng_user_provider'), $this->get('security.user_checker.login_firewall'), 'default', $this->get('security.encoder_factory'), true)), true);
 
         $instance->setEventDispatcher($this->get('debug.event_dispatcher'));
 
@@ -3336,6 +3391,28 @@ class appDevDebugProjectContainer extends Container
     }
 
     /**
+     * Gets the private 'security.channel_listener' shared service.
+     *
+     * @return \Symfony\Component\Security\Http\Firewall\ChannelListener
+     */
+    protected function getSecurity_ChannelListenerService()
+    {
+        return $this->services['security.channel_listener'] = new \Symfony\Component\Security\Http\Firewall\ChannelListener($this->get('security.access_map'), new \Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint(80, 443), $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
+    /**
+     * Gets the private 'security.http_utils' shared service.
+     *
+     * @return \Symfony\Component\Security\Http\HttpUtils
+     */
+    protected function getSecurity_HttpUtilsService()
+    {
+        $a = $this->get('router', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+
+        return $this->services['security.http_utils'] = new \Symfony\Component\Security\Http\HttpUtils($a, $a);
+    }
+
+    /**
      * Gets the private 'security.logout_url_generator' shared service.
      *
      * @return \Symfony\Component\Security\Http\Logout\LogoutUrlGenerator
@@ -3344,7 +3421,7 @@ class appDevDebugProjectContainer extends Container
     {
         $this->services['security.logout_url_generator'] = $instance = new \Symfony\Component\Security\Http\Logout\LogoutUrlGenerator($this->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE), $this->get('router', ContainerInterface::NULL_ON_INVALID_REFERENCE), $this->get('security.token_storage', ContainerInterface::NULL_ON_INVALID_REFERENCE));
 
-        $instance->registerListener('main', '/logout', 'logout', '_csrf_token', NULL);
+        $instance->registerListener('default', '/logout', 'logout', '_csrf_token', NULL);
 
         return $instance;
     }
@@ -3357,6 +3434,16 @@ class appDevDebugProjectContainer extends Container
     protected function getSecurity_RoleHierarchyService()
     {
         return $this->services['security.role_hierarchy'] = new \Symfony\Component\Security\Core\Role\RoleHierarchy(array('ROLE_ADMIN' => array(0 => 'ROLE_USER'), 'ROLE_SUPER_ADMIN' => array(0 => 'ROLE_ADMIN')));
+    }
+
+    /**
+     * Gets the private 'security.user.provider.concrete.teceng_user_provider' shared service.
+     *
+     * @return \Symfony\Bridge\Doctrine\Security\User\EntityUserProvider
+     */
+    protected function getSecurity_User_Provider_Concrete_TecengUserProviderService()
+    {
+        return $this->services['security.user.provider.concrete.teceng_user_provider'] = new \Symfony\Bridge\Doctrine\Security\User\EntityUserProvider($this->get('doctrine'), 'AppBundle:Document:User', 'username', NULL);
     }
 
     /**

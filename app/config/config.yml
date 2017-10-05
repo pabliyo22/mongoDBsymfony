@@ -77,6 +77,7 @@ fos_user:
         
         
 doctrine_mongodb:
+  
     connections:
         default:
             server: "%mongodb_server%"
@@ -84,4 +85,5 @@ doctrine_mongodb:
     default_database: test_database
     document_managers:
         default:
+            logging:                       true
             auto_mapping: true

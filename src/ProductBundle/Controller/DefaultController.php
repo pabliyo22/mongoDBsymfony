@@ -9,6 +9,7 @@ use AppBundle\Document\DailyResume;
 use AppBundle\Document\Counters;
 use AppBundle\Document\HandlerShippingEGMLog;
 use ProductBundle\Form\Type\ProductType;
+use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller {
 
@@ -33,13 +34,13 @@ class DefaultController extends Controller {
         $Counters->setJj(rand(100, 1000));
         $Counters->setJp(rand(100, 1000));
         $Counters->setDateSeqEnd(rand(100, 1000));
-
         $Counters->setDateSeqStart(rand(100, 1000));
 
         return $Counters;
     }
 
     public function insertEGMship() {
+        $dm = $this->get('doctrine_mongodb')->getManager();
         for ($index = 0; $index < 1; $index++) {
             $shipLog = new HandlerShippingEGMLog();
             $shipLog->setAccountingDate(rand(1000, 40000));
@@ -60,23 +61,32 @@ class DefaultController extends Controller {
                 $shipLog->addEGMShipping($shipEGM);
             }
             $dm->persist($shipLog);
-            $list[] = $shipLog;
+            $list = $shipLog;
         }
-        dump($list);
+
         return $list;
     }
 
-    public function addAction() {
-        $list = [];
+    public function listDetailAction(Request $request) {
+
         $dm = $this->get('doctrine_mongodb')->getManager();
-        $list = $dm->getRepository("AppBundle:HandlerShippingEGMLog")->findAll();
-        // $form = $this->createForm(ProductType::class, $shipLog);
-
-       
-
-        return $this->render('index.html.twig', array(
-                    'list' => $list,
+        $detail = $dm->getRepository("AppBundle:HandlerShippingEGMLog")->find($request->request->get('id'));
+        return $this->render('ProductBundle:Default:list.html.twig', array(
+                    'list' => $detail->getEGMShipping(),
         ));
+    }
+
+    public function addAction() {
+
+        $list = $this->insertEGMship();
+        $dm = $this->get('doctrine_mongodb')->getManager();
+
+        $usersA['id'] = $list->getId();
+        $usersA['sendDate'] = $list->getSendDate();
+        $usersA['accountingDate'] = $list->getAccountingDate();
+        $usersA['user'] = $list->getUser();
+        $usersA['winday'] = $list->getWinDay();
+        return new JsonResponse($usersA);
     }
 
 }

@@ -115,6 +115,15 @@ class appDevDebugProjectContainerUrlMatcher extends Symfony\Bundle\FrameworkBund
                 return array (  '_controller' => 'ProductBundle\\Controller\\DefaultController::indexAction',  '_route' => 'product_homepage',);
             }
 
+            // product_list
+            if (rtrim($pathinfo, '/') === '/product/list/product') {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'product_list');
+                }
+
+                return array (  '_controller' => 'ProductBundle\\Controller\\DefaultController::listDetailAction',  '_route' => 'product_list',);
+            }
+
             // product_add
             if (rtrim($pathinfo, '/') === '/product/new/product') {
                 if (substr($pathinfo, -1) !== '/') {
@@ -137,6 +146,16 @@ class appDevDebugProjectContainerUrlMatcher extends Symfony\Bundle\FrameworkBund
 
         if (0 === strpos($pathinfo, '/log')) {
             if (0 === strpos($pathinfo, '/login')) {
+                // login_route
+                if ($pathinfo === '/login') {
+                    return array (  '_controller' => 'AppBundle\\Controller\\SecurityController::loginAction',  '_route' => 'login_route',);
+                }
+
+                // login_check
+                if ($pathinfo === '/login_check') {
+                    return array (  '_controller' => 'AppBundle\\Controller\\SecurityController::login_checkAction',  '_route' => 'login_check',);
+                }
+
                 // fos_user_security_login
                 if ($pathinfo === '/login') {
                     if (!in_array($this->context->getMethod(), array('GET', 'POST', 'HEAD'))) {

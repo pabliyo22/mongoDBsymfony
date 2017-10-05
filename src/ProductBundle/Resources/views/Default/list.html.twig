@@ -1,0 +1,111 @@
+{# empty Twig template #}
+<div class="row">
+    <div class="col l12">
+
+        <div class="col l12">
+
+            <ul class="collapsible" data-collapsible="accordion">
+                <li>
+                    <div class="collapsible-header"><i class="material-icons">filter_drama</i>First</div>
+                    <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+                </li>
+                <li>
+                    <div class="collapsible-header"><i class="material-icons">place</i>Second</div>
+                    <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+                </li>
+                <li>
+                    <div class="collapsible-header"><i class="material-icons">whatshot</i>Third</div>
+                    <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+                </li>
+            </ul>
+            <table class="bordered hover striped">
+                <thead class="thead-inverse">
+                    <tr>
+                        <th class="center-text" colspan="5">{{'idEGM'|trans}}</th>
+                        <th class="center-text"colspan="5">{{'FirstCounter'|trans}} </th>
+                        <th class="center-text" colspan="5">{{'LastCounter'|trans}} </th>
+                    </tr>     
+                    <tr>
+                        <th>{{'idEGM' | trans}}</th>
+                        <th>{{'nroPres'|trans }}</th>
+                        <th>{{'sequence' | trans}}</th>
+                        <th>{{'denomination' | trans}}</th>  
+                        <th>{{'win' | trans}}</th>
+                        <th>{{'DateSecStar' | trans}}</th>
+
+                        <th>{{'jj' | trans}}</th>
+                        <th>{{'coinIn' | trans}}</th>
+                        <th>{{'coinOut' | trans}}</th>
+                        <th>{{'jackpot' |trans}}</th>                
+                        <th>{{'DateSecStar'}} |trans</th>
+
+                        <th>{{'jj' |trans }}</th>
+                        <th>{{'coinIn' |trans}}</th>
+                        <th>{{'coinOut' |trans}}</th>
+                        <th>{{'jackpot' |trans }}</th>                
+                    </tr> 
+                </thead>
+                <tbody id="contentTableUser">
+                    {% for ship in list %}  
+
+                        <tr>
+                            <td> 
+                                {{ ship.egm   }} 
+                            </td>
+                            <td>
+                                {{ ship.nrosec  }} 
+                            </td>
+                            <td>
+                                {{ ship.nropres  }} 
+                            </td>
+                            <td> 
+                                {{ ship.denomegm }} 
+                            </td>
+                            <td> 
+                                {{ ship.win   }}
+                            </td>                      
+
+                            <td >
+                                {{ship.FirstCounter[0].dateSeqStart|date('d/m/Y H:i:s')  }}
+                            </td>
+
+                            <td >
+                                {{ship.FirstCounter[0].jj}}
+
+                            </td>
+                            <td >
+                                {{ship.FirstCounter[0].ci}}
+
+                            </td>
+                            <td >
+                                {{ship.FirstCounter[0].co}}
+
+                            </td>
+                            <td >
+                                {{ship.FirstCounter[0].jp}}
+                            </td>       
+                            <td >
+                                {{ship.LastCounter[0].dateSeqEnd|date('d/m/Y  H:i:s')  }}
+                            </td>
+                            <td >
+                                {{ship.LastCounter[0].jj}}
+
+                            </td>
+                            <td >
+                                {{ship.LastCounter[0].ci}}
+
+                            </td>
+                            <td >
+                                {{ship.LastCounter[0].co}}
+                            </td>
+                            <td >
+                                {{ship.LastCounter[0].jp}}
+                            </td>
+
+                        </tr>
+                    {% endfor %}   
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -8,26 +8,26 @@
 
                 {#           {{dump(list)}}#}
 
-                <table class="table table-bordered table-hover table-striped">
+                <table class="bordered hover striped">
                     <thead class="thead-inverse">
                         <tr>
                             <th>
-                                {{'..id'|trans}}&nbsp;
+                                {{'id'|trans}}&nbsp;
                             </th>
                             <th>
-                                {{'..sendDate'|trans|raw}}&nbsp;
+                                {{'sendDate'|trans|raw}}&nbsp;
                             </th>
                             <th>
-                                {{'..sendDate'|trans|raw}}&nbsp;
+                                {{'accountingDate'|trans|raw}}&nbsp;
                             </th>
                             <th>
-                                {{'..sendDate'|trans|raw}}&nbsp;
+                                {{'user'|trans|raw}}&nbsp;
                             </th>
                             <th>
-                                {{'..sendDate'|trans|raw}}&nbsp;
+                                {{'winday'|trans|raw}}&nbsp;
                             </th>
 
-                            <th>{{'..actions'|trans|raw}}</th>
+                            <th>{{'actions'|trans|raw}}</th>
                         </tr>
                     </thead>
                     <tbody id="contentTableUser">
@@ -39,12 +39,9 @@
                                 <td> 
                                     {{ ship.sendDate   }} 
                                 </td>
-
-
                                 <td> 
                                     {{ ship.accountingDate|date('d/m/Y')   }}
                                 </td>                      
-
                                 <td> 
                                     {{ ship.user }} 
                                 </td>
@@ -52,7 +49,8 @@
                                     {{ ship.winday  }} 
                                 </td>
                                 <td>
-                                    <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a>
+                                    <a class="waves-effect waves-light btn modal-trigger" id="{{ship.id}}" href="#modal1">
+                                        <i class="material-icons">assessment</i></a>
                                 </td>
                             </tr>
                         {% endfor %}   
@@ -60,6 +58,9 @@
                 </table>
                 <script>
                     $(document).ready(function () {
+
+                        $('.collapsible').collapsible();
+
                         // the "href" attribute of the modal trigger must specify the modal ID that wants to be triggered
                         $('.modal').modal({
                             dismissible: true, // Modal can be dismissed by clicking outside of the modal
@@ -69,11 +70,13 @@
                             startingTop: '4%', // Starting top style attribute
                             endingTop: '10%', // Ending top style attribute
                             ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+
                                 $.ajax({
                                     type: "POST",
-                                    url: ' {{path('product_add')}}',
+                                    url: ' {{path('product_list')}}',
+                                    data: {id: trigger[0].id},
                                     success: function (response) {
-                                        console.log(response);
+                                        $("#modal-body").html(response);
                                     },
                                     error: function (response) {
 
@@ -81,23 +84,26 @@
                                 });
                             },
                             complete: function () {
+                                $("#modal-body").html(' <div class="row">\
+                                                <div class="col s6 offset-s5"><div class="preloader-wrapper big active">\
+                                                    <div class = "spinner-layer spinner-green-only" >\
+                                                    <div class = "circle-clipper left">\
+                                                    <div class = "circle"> </div>\
+                                                    </div><div class="gap-patch">\
+                                                    <div class = "circle"> </div>\
+                                                    </div><div class="circle-clipper right">\
+                                                    <div class = "circle > </div>\
+                                                    </div>\
+                                                    </div>\
+                                                    </div>\
+                                                    </div>\
+                                                </div>');
 
                             } // Callback for Modal close
                         }
                         );
-
                     });
                 </script>
-            </div>
-            <!-- Modal Structure -->
-            <div id="modal1" class="modal bottom-sheet">
-                <div class="modal-content">
-                    <h4>Modal Header</h4>
-                    <p>A bunch of text</p>
-                </div>
-                <div class="modal-footer">
-                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-                </div>
             </div>
 
             <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
