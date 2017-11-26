@@ -40,7 +40,7 @@ class DefaultController extends Controller {
     }
 
     public function insertEGMship() {
-        $dm = $this->get('doctrine_mongodb')->getManager();
+
         for ($index = 0; $index < 1; $index++) {
             $shipLog = new HandlerShippingEGMLog();
             $shipLog->setAccountingDate(rand(1000, 40000));
@@ -60,16 +60,15 @@ class DefaultController extends Controller {
                 $shipEGM->setWin(rand(-50, 10000));
                 $shipLog->addEGMShipping($shipEGM);
             }
-            $dm->persist($shipLog);
-            $list = $shipLog;
         }
 
-        return $list;
+        return $shipLog;
     }
 
     public function listDetailAction(Request $request) {
 
         $dm = $this->get('doctrine_mongodb')->getManager();
+
         $detail = $dm->getRepository("AppBundle:HandlerShippingEGMLog")->find($request->request->get('id'));
         return $this->render('ProductBundle:Default:list.html.twig', array(
                     'list' => $detail->getEGMShipping(),
@@ -80,12 +79,15 @@ class DefaultController extends Controller {
 
         $list = $this->insertEGMship();
         $dm = $this->get('doctrine_mongodb')->getManager();
+        $dm->persist($list);
 
+        //
         $usersA['id'] = $list->getId();
         $usersA['sendDate'] = $list->getSendDate();
         $usersA['accountingDate'] = $list->getAccountingDate();
         $usersA['user'] = $list->getUser();
         $usersA['winday'] = $list->getWinDay();
+        $dm->flush($list);
         return new JsonResponse($usersA);
     }
 
